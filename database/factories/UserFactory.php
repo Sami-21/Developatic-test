@@ -23,10 +23,16 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $minYear = now()->year - 75;
+        $maxYear = now()->year - 15;
+
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
+            'birth_date' => fake()->dateTimeBetween($minYear . '-01-01', $maxYear . '-12-31')
+                ->format('Y-m-d'),
+            'type' => 'STANDARD',
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
