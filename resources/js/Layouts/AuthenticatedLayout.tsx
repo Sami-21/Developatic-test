@@ -1,16 +1,48 @@
-import { useState, PropsWithChildren, ReactNode } from 'react';
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link } from '@inertiajs/react';
-import { User } from '@/types';
+import React, { useState, PropsWithChildren, ReactNode } from "react";
+import ApplicationLogo from "@/Components/ApplicationLogo";
+import Dropdown from "@/Components/Dropdown";
+import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
+import { Head, Link } from "@inertiajs/react";
+import { User } from "@/types";
+import { Footer } from "antd/es/layout/layout";
+import { Layout, Menu, theme } from "antd";
+import { AreaChartOutlined, UserOutlined } from "@ant-design/icons";
+const { Sider } = Layout;
+import type { MenuProps } from "antd";
 
-export default function Authenticated({ user, header, children }: PropsWithChildren<{ user: User, header?: ReactNode }>) {
-    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+const footerStyle: React.CSSProperties = {
+    width: "100%",
+    height: 75,
+    textAlign: "center",
+    backgroundColor: "#fff",
+};
+
+const menuItems: MenuProps["items"] = [
+    { title: "Stats", icon: AreaChartOutlined, url: "/" },
+    { title: "Users", icon: UserOutlined, url: "/users" },
+].map((item, index) => {
+    const key = String(index + 1);
+    return {
+        key: key,
+        icon: React.createElement(item.icon),
+        label: <Link href={item.url}>{item.title}</Link>,
+    };
+});
+
+export default function Authenticated({
+    user,
+    header,
+    pageTitle,
+    children,
+}: PropsWithChildren<{ user: User; header?: string; pageTitle: string }>) {
+    const [showingNavigationDropdown, setShowingNavigationDropdown] =
+        useState(false);
+    const {
+        token: { colorBgContainer, borderRadiusLG },
+    } = theme.useToken();
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="flex flex-col min-h-screen bg-gray-100">
             <nav className="bg-white border-b border-gray-100">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
@@ -22,9 +54,12 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                             </div>
 
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink href={route('dashboard')} active={route().current('dashboard')}>
+                                {/* <NavLink
+                                    href={"/"}
+                                    active={route().current("dashboard")}
+                                >
                                     Dashboard
-                                </NavLink>
+                                </NavLink> */}
                             </div>
                         </div>
 
@@ -56,8 +91,11 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-                                        <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
-                                        <Dropdown.Link href={route('logout')} method="post" as="button">
+                                        <Dropdown.Link
+                                            href={route("logout")}
+                                            method="post"
+                                            as="button"
+                                        >
                                             Log Out
                                         </Dropdown.Link>
                                     </Dropdown.Content>
@@ -67,19 +105,36 @@ export default function Authenticated({ user, header, children }: PropsWithChild
 
                         <div className="-me-2 flex items-center sm:hidden">
                             <button
-                                onClick={() => setShowingNavigationDropdown((previousState) => !previousState)}
+                                onClick={() =>
+                                    setShowingNavigationDropdown(
+                                        (previousState) => !previousState
+                                    )
+                                }
                                 className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out"
                             >
-                                <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                                <svg
+                                    className="h-6 w-6"
+                                    stroke="currentColor"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
                                     <path
-                                        className={!showingNavigationDropdown ? 'inline-flex' : 'hidden'}
+                                        className={
+                                            !showingNavigationDropdown
+                                                ? "inline-flex"
+                                                : "hidden"
+                                        }
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
                                         strokeWidth="2"
                                         d="M4 6h16M4 12h16M4 18h16"
                                     />
                                     <path
-                                        className={showingNavigationDropdown ? 'inline-flex' : 'hidden'}
+                                        className={
+                                            showingNavigationDropdown
+                                                ? "inline-flex"
+                                                : "hidden"
+                                        }
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
                                         strokeWidth="2"
@@ -91,11 +146,19 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                     </div>
                 </div>
 
-                <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
+                <div
+                    className={
+                        (showingNavigationDropdown ? "block" : "hidden") +
+                        " sm:hidden"
+                    }
+                >
                     <div className="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
+                        {/* <ResponsiveNavLink
+                            href={route("dashboard")}
+                            active={route().current("dashboard")}
+                        >
                             Dashboard
-                        </ResponsiveNavLink>
+                        </ResponsiveNavLink> */}
                     </div>
 
                     <div className="pt-4 pb-1 border-t border-gray-200">
@@ -103,12 +166,17 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                             <div className="font-medium text-base text-gray-800">
                                 {user.name}
                             </div>
-                            <div className="font-medium text-sm text-gray-500">{user.email}</div>
+                            <div className="font-medium text-sm text-gray-500">
+                                {user.email}
+                            </div>
                         </div>
 
                         <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>Profile</ResponsiveNavLink>
-                            <ResponsiveNavLink method="post" href={route('logout')} as="button">
+                            <ResponsiveNavLink
+                                method="post"
+                                href={route("logout")}
+                                as="button"
+                            >
                                 Log Out
                             </ResponsiveNavLink>
                         </div>
@@ -118,11 +186,36 @@ export default function Authenticated({ user, header, children }: PropsWithChild
 
             {header && (
                 <header className="bg-white shadow">
-                    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{header}</div>
+                    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                            {header}
+                        </h2>
+                    </div>
                 </header>
             )}
+            <Head title={pageTitle} />
+            <Layout
+                style={{
+                    flex: 1,
+                    margin: 20,
+                    overflow: "hidden",
+                    background: colorBgContainer,
+                    borderRadius: borderRadiusLG,
+                }}
+            >
+                <Sider style={{ background: colorBgContainer }} width={250}>
+                    <Menu
+                        mode="inline"
+                        style={{ height: "100%" }}
+                        items={menuItems}
+                    />
+                </Sider>
+                {children}
+            </Layout>
 
-            <main>{children}</main>
+            <Footer style={footerStyle}>
+                <span>&copy; Developatic 2023</span>
+            </Footer>
         </div>
     );
 }
