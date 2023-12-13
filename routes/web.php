@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -32,9 +32,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/', function () {
         return Inertia::render('Stats');
     });
-    Route::get('/users', function () {
-        return Inertia::render('Users');
-    });
+
+    //Users routes
+    Route::get('/users', [UserController::class, 'index']);
+    Route::get('/users/create', [UserController::class, 'create']);
+    Route::post('/users/store', [UserController::class, 'store']);
+    Route::delete('/users/{id}', [UserController::class, 'destroy']);
+
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 });
