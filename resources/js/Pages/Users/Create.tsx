@@ -90,7 +90,12 @@ export default function Create({ auth }: PageProps) {
                         label="Birth date"
                         name="birth_date"
                         rules={[
-                            { required: true, type: "date", max: Date.now() },
+                            {
+                                required: true,
+                                type: "date",
+                                max: Date.now(),
+                                message: "invalid birth date",
+                            },
                         ]}
                     >
                         <Input

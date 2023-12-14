@@ -4,7 +4,7 @@ import { Card, Flex, Skeleton, Typography } from "antd";
 
 interface CardProps {
     description: string;
-    stat: string;
+    stat: number | string;
     loading?: boolean;
 }
 

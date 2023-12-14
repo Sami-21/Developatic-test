@@ -1,18 +1,16 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { PageProps } from "@/types";
 import { DeleteFilled, PlusOutlined } from "@ant-design/icons";
-import { Button, Flex, Layout, Pagination, Space, Table } from "antd";
+import { Button, Flex, Input, Layout, Pagination, Space, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import Search from "antd/es/input/Search";
 import Swal from "sweetalert2";
-const { Content } = Layout;
 import { router } from "@inertiajs/react";
+import { useEffect, useState } from "react";
+import axiosInstance from "@/axios";
 
-interface UserPageProps extends PageProps {
-    users: any;
-}
+const { Content } = Layout;
 
-export default function Index({ auth, users }: UserPageProps) {
+export default function Index({ auth }: PageProps) {
     const columns: ColumnsType<any> = [
         {
             title: "Name",
@@ -89,11 +87,53 @@ export default function Index({ auth, users }: UserPageProps) {
         });
     };
 
+    const [users, setUsers] = useState<any>({});
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const getUsers = async () => {
+        try {
+            Swal.showLoading();
+            const { data } = await axiosInstance.get(
+                `api/users?page=${currentPage}&q=${searchQuery}`
+            );
+            Swal.close();
+            setUsers(data);
+            console.log(data);
+        } catch (error) {
+            Swal.fire({
+                title: "Error!",
+                text: "error occured while fetching users",
+                icon: "error",
+                confirmButtonText: "return",
+            });
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        getUsers();
+        return () => {
+            setUsers({});
+        };
+    }, []);
+
+    const handleSearch = () => {
+        setCurrentPage(1);
+        getUsers();
+    };
+
     return (
         <AuthenticatedLayout user={auth.user} header="Users" pageTitle="Users">
             <Content style={{ padding: "24px" }}>
                 <Flex justify="end" style={{ paddingBlock: 10 }} gap={30}>
-                    <Search />
+                    <Input.Search
+                        value={searchQuery}
+                        onChange={(e) => {
+                            setSearchQuery(e.target.value);
+                        }}
+                        onSearch={handleSearch}
+                    />
+
                     <Button
                         type="link"
                         href="/users/create"
@@ -117,7 +157,10 @@ export default function Index({ auth, users }: UserPageProps) {
                     total={users.total}
                     pageSize={users.per_page}
                     showSizeChanger={false}
-                    onChange={(page) => router.get(`/users?page=${page}`)}
+                    onChange={(page) => {
+                        setCurrentPage(page);
+                        getUsers();
+                    }}
                 />
             </Content>
         </AuthenticatedLayout>
